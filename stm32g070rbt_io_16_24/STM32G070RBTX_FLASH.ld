@@ -22,7 +22,7 @@
 ******************************************************************************
 ** @attention
 **
-** Copyright (c) 2023 STMicroelectronics.
+** Copyright (c) 2022 STMicroelectronics.
 ** All rights reserved.
 **
 ** This software is licensed under terms that can be found in the LICENSE file
@@ -45,20 +45,38 @@ _Min_Stack_Size = 0x400; /* required amount of stack */
 MEMORY
 {
   RAM    (xrw)    : ORIGIN = 0x20000000,   LENGTH = 36K
-  FLASH    (rx)    : ORIGIN = 0x8000000,   LENGTH = 128K
+  TAG    (RX)     : ORIGIN = 0x08005000,   LENGTH = 1K
+  FLASH    (rx)   : ORIGIN = 0x08005400,   LENGTH = 107K
 }
 
 /* Sections */
 SECTIONS
 {
   /* The startup code into "FLASH" Rom type memory */
+  
+  .tag :
+  {
+  	. = ALIGN(4);
+    _flash_tag_addr = .;
+    KEEP(*(.tag))
+    . = ALIGN(4);
+  } >TAG
+  
   .isr_vector :
   {
     . = ALIGN(4);
+    __isr_vector_addr = .;   
     KEEP(*(.isr_vector)) /* Startup code */
     . = ALIGN(4);
   } >FLASH
 
+  .version :
+  {
+    . = ALIGN(1024);
+    KEEP(*(.version)) 
+    . = ALIGN(4);
+  } >FLASH
+  
   /* The program code and other data into "FLASH" Rom type memory */
   .text :
   {

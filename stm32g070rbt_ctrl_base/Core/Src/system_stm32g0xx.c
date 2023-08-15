@@ -177,6 +177,10 @@
   * @{
   */
 
+
+  extern uint32_t __isr_vector_addr;
+
+
 /**
   * @brief  Setup the microcontroller system.
   * @param  None
@@ -186,7 +190,8 @@ void SystemInit(void)
 {
   /* Configure the Vector Table location -------------------------------------*/
 #if defined(USER_VECT_TAB_ADDRESS)
-  SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation */
+  //SCB->VTOR = VECT_TAB_BASE_ADDRESS | VECT_TAB_OFFSET; /* Vector Table Relocation */
+  SCB->VTOR = (uint32_t)&__isr_vector_addr;
 #endif /* USER_VECT_TAB_ADDRESS */
 }
 
