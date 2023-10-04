@@ -1,0 +1,3 @@
+bookmark shortkey   ctrl + alt + k  (toggle)
+                    ctrl + alt + l, j  ( < > )
+

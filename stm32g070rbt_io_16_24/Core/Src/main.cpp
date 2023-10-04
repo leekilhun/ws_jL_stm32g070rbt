@@ -52,6 +52,9 @@ int main(void)
 
 	SystemClock_Config();
 
+	// PB15 and PA8 pull-down 상태 해제
+	HAL_SYSCFG_StrobeDBattpinsConfig(SYSCFG_UCPD1_STROBE);
+
 	MX_GPIO_Init();
 	MX_DMA_Init();
 	MX_SPI1_Init();

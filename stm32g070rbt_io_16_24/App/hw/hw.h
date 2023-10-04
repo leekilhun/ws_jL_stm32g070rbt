@@ -26,6 +26,7 @@ extern "C" {
 #include "rtc.h"
 #include "spi.h"
 #include "reset.h"
+#include "swTimer.h"
 #include "buzzer.h"
 
 

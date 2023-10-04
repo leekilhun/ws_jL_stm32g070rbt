@@ -79,6 +79,9 @@
 #define      HW_CLI_LINE_HIS_MAX    4
 #define      HW_CLI_LINE_BUF_MAX    64
 
+#define _USE_HW_SWTIMER
+#define      HW_SWTIMER_MAX_CH      4
+
 //#define _USE_HW_CAN
 #define      HW_CAN_MAX_CH          1
 #define      HW_CAN_MSG_RX_BUF_MAX  16

@@ -57,6 +57,10 @@ bool hwInit(void)
   ret &= uartInit();
 #endif
 
+#ifdef _USE_HW_SWTIMER
+  ret &=swtimerInit();
+#endif
+
 #ifdef _USE_HW_GPIO
   ret &= gpioInit();
 #endif
