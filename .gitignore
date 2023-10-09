@@ -7,9 +7,22 @@
 
 
 
-## 폴더 무시
-.settings/
+## 다음과 같은 확장자는 전체 무시  
+*.exe 
+*.zip
+*.log
+*.bin
+*.launch
+*.chm
+*.fw
 
+## 폴더 무시
+.vs/
+.metadata/
+Debug/
+build/
+Templates/
+_htmresc/
 
 
 
