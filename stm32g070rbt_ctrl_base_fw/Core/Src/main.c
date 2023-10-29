@@ -54,11 +54,8 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 UART_HandleTypeDef huart3;
 DMA_HandleTypeDef hdma_usart1_rx;
-DMA_HandleTypeDef hdma_usart1_tx;
 DMA_HandleTypeDef hdma_usart2_rx;
-DMA_HandleTypeDef hdma_usart2_tx;
 DMA_HandleTypeDef hdma_usart3_rx;
-DMA_HandleTypeDef hdma_usart3_tx;
 
 /* USER CODE BEGIN PV */
 
@@ -265,7 +262,7 @@ static void MX_I2C2_Init(void)
 
   /* USER CODE END I2C2_Init 1 */
   hi2c2.Instance = I2C2;
-  hi2c2.Init.Timing = 0x10707DBC;
+  hi2c2.Init.Timing = 0x00602173;
   hi2c2.Init.OwnAddress1 = 0;
   hi2c2.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c2.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -611,10 +608,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOD, BUZZER_Pin|OUT_13_Pin|OUT_12_Pin|OUT_11_Pin
                           |OUT_10_Pin|OUT_9_Pin|OUT_8_Pin|OUT_7_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : LAMP_RESET_Pin LAMP_STOP_Pin LAMP_START_Pin STATUS_Pin
-                           OUT_15_Pin OUT_14_Pin */
-  GPIO_InitStruct.Pin = LAMP_RESET_Pin|LAMP_STOP_Pin|LAMP_START_Pin|STATUS_Pin
-                          |OUT_15_Pin|OUT_14_Pin;
+  /*Configure GPIO pins : LAMP_RESET_Pin LAMP_STOP_Pin LAMP_START_Pin OUT_15_Pin
+                           OUT_14_Pin */
+  GPIO_InitStruct.Pin = LAMP_RESET_Pin|LAMP_STOP_Pin|LAMP_START_Pin|OUT_15_Pin
+                          |OUT_14_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -625,6 +622,13 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /*Configure GPIO pin : STATUS_Pin */
+  GPIO_InitStruct.Pin = STATUS_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(STATUS_GPIO_Port, &GPIO_InitStruct);
 
   /*Configure GPIO pins : IN_0_Pin IN_1_Pin IN_2_Pin */
   GPIO_InitStruct.Pin = IN_0_Pin|IN_1_Pin|IN_2_Pin;

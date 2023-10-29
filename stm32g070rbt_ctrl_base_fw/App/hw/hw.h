@@ -27,6 +27,7 @@ extern "C" {
 #include "spi.h"
 #include "reset.h"
 #include "buzzer.h"
+#include "lcd.h"
 #include "swTimer.h"
 
 bool hwInit(void);

@@ -32,18 +32,25 @@ extern UART_HandleTypeDef huart2;
 extern UART_HandleTypeDef huart3;
 
 extern DMA_HandleTypeDef hdma_usart1_rx;
-extern DMA_HandleTypeDef hdma_usart1_tx;
 extern DMA_HandleTypeDef hdma_usart2_rx;
-extern DMA_HandleTypeDef hdma_usart2_tx;
 extern DMA_HandleTypeDef hdma_usart3_rx;
-extern DMA_HandleTypeDef hdma_usart3_tx;
 
 static qbuffer_t qbuffer[UART_MAX_CH];
 static uart_tbl_t uart_tbl[UART_MAX_CH];
 
+
+#ifdef _USE_HW_UART_1_DMA_TX
 static uint8_t uart1_tx_data[UART_BUF_LENGTH];
+#endif
+
+#ifdef _USE_HW_UART_2_DMA_TX
 static uint8_t uart2_tx_data[UART_BUF_LENGTH];
+#endif
+
+#ifdef _USE_HW_UART_3_DMA_TX
 static uint8_t uart3_tx_data[UART_BUF_LENGTH];
+#endif
+
 
 #ifdef _USE_HW_CLI
 static void cliUart(cli_args_t *args);
@@ -141,7 +148,7 @@ bool uartOpen(uint8_t ch, uint32_t baud)
       break;
 
     case _DEF_UART3:
-#ifdef _USE_HW_UART_4_DMA_RX
+#ifdef _USE_HW_UART_3_DMA_RX
       is_dma = true;
 #endif
       break;

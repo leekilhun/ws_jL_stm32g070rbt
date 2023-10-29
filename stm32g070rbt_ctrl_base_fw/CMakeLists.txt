@@ -24,6 +24,8 @@ file(GLOB SRC_FILES CONFIGURE_DEPENDS
   Core/Src/syscalls.c
   Core/Src/sysmem.c
   Core/Src/system_stm32g0xx.c
+  App/hw/driver/hangul/*.c
+  App/hw/driver/lcd/*.c
 )
 
 file(GLOB_RECURSE SRC_FILES_RECURSE CONFIGURE_DEPENDS
@@ -60,6 +62,9 @@ target_include_directories(${EXECUTABLE} PRIVATE
   App/common 
   App/common/core
   App/common/inc_hw
+  App/common/inc_hw/lcd
+  App/hw/driver/hangul
+  App/hw/driver/lcd
   App/common/inc_exhw
   App/exhw
   App/hw
@@ -90,6 +95,24 @@ target_compile_options(${EXECUTABLE} PRIVATE
   -Wall
   -Os
   -g3
+  )
+
+  target_compile_options(${EXECUTABLE} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:
+  -mcpu=cortex-m0plus 
+  -std=gnu++17 
+  -g3 
+  -Os 
+  -ffunction-sections 
+  -fdata-sections 
+  -fno-exceptions 
+  -fno-rtti 
+  -fno-use-cxa-atexit 
+  -Wall 
+  -fstack-usage 
+  --specs=nano.specs 
+  -mfloat-abi=soft 
+  -mthumb
+  >
   )
 
 target_link_options(${EXECUTABLE} PRIVATE

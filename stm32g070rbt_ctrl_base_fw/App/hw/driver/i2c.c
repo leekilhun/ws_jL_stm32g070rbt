@@ -42,8 +42,6 @@ static osMutexId mutex_lock[I2C_MAX_CH];
 static const osMutexDef_t mutex_lock_def[I2C_MAX_CH];
 #endif
 
-
-extern I2C_HandleTypeDef hi2c1;
 extern I2C_HandleTypeDef hi2c2;
 
 
@@ -60,8 +58,7 @@ typedef struct
 
 static i2c_tbl_t i2c_tbl[I2C_MAX_CH] =
     {
-        { &hi2c1, GPIOB, GPIO_PIN_8,  GPIOB, GPIO_PIN_9},
-        { &hi2c2, GPIOB, GPIO_PIN_13,  GPIOB, GPIO_PIN_14}
+        { &hi2c2, GPIOA, GPIO_PIN_11,  GPIOA, GPIO_PIN_12}
     };
 
 static const uint32_t i2c_freq_tbl[] =
@@ -116,37 +113,6 @@ bool i2cBegin(uint8_t ch, i2c_freq_t freq_khz)
   switch(ch)
   {
     case _DEF_I2C1:
-    {
-      i2c_freq[ch] = freq_khz;
-      is_open[ch] = false;
-
-      p_handle->Instance             = I2C1;
-      p_handle->Init.Timing          = i2c_freq_tbl[freq_khz];
-      p_handle->Init.OwnAddress1     = 0x00;
-      p_handle->Init.AddressingMode  = I2C_ADDRESSINGMODE_7BIT;
-      p_handle->Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
-      p_handle->Init.OwnAddress2     = 0x00;
-      p_handle->Init.OwnAddress2Masks= I2C_OA2_NOMASK;
-      p_handle->Init.GeneralCallMode = I2C_GENERALCALL_DISABLE;
-      p_handle->Init.NoStretchMode   = I2C_NOSTRETCH_DISABLE;
-
-      i2cReset(ch);
-
-      HAL_I2C_DeInit(p_handle);
-      if(HAL_I2C_Init(p_handle) == HAL_OK)
-      {
-        /* Enable the Analog I2C Filter */
-        HAL_I2CEx_ConfigAnalogFilter(p_handle, I2C_ANALOGFILTER_ENABLE);
-
-        /* Configure Digital filter */
-        HAL_I2CEx_ConfigDigitalFilter(p_handle, 0);
-
-        ret = true;
-        is_open[ch] = true;
-      }
-    }
-    break;
-    case _DEF_I2C2:
     {
       i2c_freq[ch] = freq_khz;
       is_open[ch] = false;

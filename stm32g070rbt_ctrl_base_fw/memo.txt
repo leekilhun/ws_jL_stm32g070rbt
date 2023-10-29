@@ -1,202 +1,42 @@
-kocoafab.cc/tutorial/view/503
 
 
+-mcpu=cortex-m0plus 
+-std=gnu++17 
+-g3 
+-DDEBUG 
+-DUSER_VECT_TAB_ADDRESS 
+-DUSE_HAL_DRIVER 
+-DSTM32G070xx 
+-DUSE_FULL_LL_DRIVER 
+-c 
+-I../Core/Inc 
+-I../Drivers/STM32G0xx_HAL_Driver/Inc 
+-I../Drivers/STM32G0xx_HAL_Driver/Inc/Legacy 
+-I../Drivers/CMSIS/Device/ST/STM32G0xx/Include 
+-I../Drivers/CMSIS/Include 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\ap" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\ap\_inc" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\ap\api" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\ap\cn" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\bsp" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\common" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\common\core" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\common\inc_exhw" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\common\inc_hw" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\exhw" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\exhw\driver" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\hw" 
+-I"D:\stmIDE\ws_jL_stm32g070rbt\stm32g070rbt_ctrl_base_fw\App\hw\driver" 
+-Os 
+-ffunction-sections 
+-fdata-sections 
+-fno-exceptions 
+-fno-rtti 
+-fno-use-cxa-atexit 
+-Wall 
+-fstack-usage 
+-fcyclomatic-complexity 
+--specs=nano.specs 
+-mfloat-abi=soft 
+-mthumb
 
-
-
-
-아래는 STM32G070 마이크로컨트롤러를 사용하여 DMA를 통해 확장된 입력 상태를 확인하는 코드입니다. 이 코드는 74HC165을 사용하여 입력 상태를 읽고, DMA를 통해 읽은 데이터를 메모리로 전송하고 확장된 입력 상태를 확인합니다.
-
-c
-Copy code
-#include "stm32g0xx_hal.h"
-#include <stdio.h>
-
-#define HC165_CLK_Pin GPIO_PIN_0
-#define HC165_CLK_GPIO_Port GPIOA
-#define HC165_SH_LD_Pin GPIO_PIN_1
-#define HC165_SH_LD_GPIO_Port GPIOA
-#define HC165_QA_Pin GPIO_PIN_6
-#define HC165_QA_GPIO_Port GPIOA
-#define HC165_QB_Pin GPIO_PIN_7
-#define HC165_QB_GPIO_Port GPIOA
-#define HC165_QC_Pin GPIO_PIN_8
-#define HC165_QC_GPIO_Port GPIOA
-#define HC165_QD_Pin GPIO_PIN_9
-#define HC165_QD_GPIO_Port GPIOA
-#define HC165_QE_Pin GPIO_PIN_10
-#define HC165_QE_GPIO_Port GPIOA
-#define HC165_QF_Pin GPIO_PIN_11
-#define HC165_QF_GPIO_Port GPIOA
-#define HC165_QG_Pin GPIO_PIN_12
-#define HC165_QG_GPIO_Port GPIOA
-#define HC165_QH_Pin GPIO_PIN_15
-#define HC165_QH_GPIO_Port GPIOA
-
-DMA_HandleTypeDef hdma_tim2_up;
-TIM_HandleTypeDef htim2;
-
-uint8_t input_state[8] = {0}; // 74HC165 입력 상태 저장 배열
-
-void SystemClock_Config(void);
-void MX_GPIO_Init(void);
-void MX_DMA_Init(void);
-void MX_TIM2_Init(void);
-
-void HC165_ReadInputs(void)
-{
-  HAL_GPIO_WritePin(HC165_SH_LD_GPIO_Port, HC165_SH_LD_Pin, GPIO_PIN_LOW); // SH/LD 핀 LOW로 설정
-
-  // CLK 핀을 8번 토글하여 8비트 데이터 읽기
-  for (int i = 0; i < 8; i++)
-  {
-    HAL_GPIO_WritePin(HC165_CLK_GPIO_Port, HC165_CLK_Pin, GPIO_PIN_HIGH); // CLK 핀 HIGH로 설정
-    HAL_GPIO_WritePin(HC165_CLK_GPIO_Port, HC165_CLK_Pin, GPIO_PIN_LOW);  // CLK 핀 LOW로 설정
-
-    // 74HC165의 출력 상태를 읽어와 input_state 배열에 저장
-    input_state[7 - i] = HAL_GPIO_ReadPin(HC165_QH_GPIO_Port, HC165_QH_Pin);
-  }
-
-  HAL_GPIO_WritePin(HC165_SH_LD_GPIO_Port, HC165_SH_LD_Pin, GPIO_PIN_HIGH); // SH/LD 핀 HIGH로 설정
-}
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  if (htim->Instance == TIM2)
-  {
-    HC165_ReadInputs();
-  }
-}
-
-void DMA_Init(void)
-{
-  __HAL_RCC_DMA1_CLK_ENABLE();
-
-  hdma_tim2_up.Instance = DMA1_Channel2;
-  hdma_tim2_up.Init.Direction = DMA_PERIPH_TO_MEMORY;
-  hdma_tim2_up.Init.PeriphInc = DMA_PINC_DISABLE;
-  hdma_tim2_up.Init.MemInc = DMA_MINC_ENABLE;
-  hdma_tim2_up.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-  hdma_tim2_up.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-  hdma_tim2_up.Init.Mode = DMA_NORMAL;
-  hdma_tim2_up.Init.Priority = DMA_PRIORITY_LOW;
-  if (HAL_DMA_Init(&hdma_tim2_up) != HAL_OK)
-  {
-    Error_Handler();
-  }
-
-  __HAL_LINKDMA(&htim2, hdma[TIM_DMA_ID_UPDATE], hdma_tim2_up);
-  HAL_NVIC_SetPriority(DMA1_Channel2_IRQn, 0, 0);
-  HAL_NVIC_EnableIRQ(DMA1_Channel2_IRQn);
-}
-
-void DMA1_Channel2_IRQHandler(void)
-{
-  HAL_DMA_IRQHandler(&hdma_tim2_up);
-}
-
-void HAL_TIM_PeriodElapsedHalfCpltCallback(TIM_HandleTypeDef *htim)
-{
-  if (htim->Instance == TIM2)
-  {
-    // DMA 전송 완료된 상태에서 출력 확인
-    printf("Input State: %d %d %d %d %d %d %d %d\n",
-           input_state[0], input_state[1], input_state[2], input_state[3],
-           input_state[4], input_state[5], input_state[6], input_state[7]);
-  }
-}
-
-int main(void)
-{
-  HAL_Init();
-  SystemClock_Config();
-  MX_GPIO_Init();
-  MX_DMA_Init();
-  MX_TIM2_Init();
-
-  HAL_TIM_Base_Start_DMA(&htim2, (uint32_t *)&htim2.Instance->ARR, 1);
-
-  while (1)
-  {
-  }
-}
-
-void SystemClock_Config(void)
-{
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK | RCC_CLOCKTYPE_SYSCLK |
-                                RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-
-void MX_GPIO_Init(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct = {0};
-
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-
-  HAL_GPIO_WritePin(HC165_SH_LD_GPIO_Port, HC165_SH_LD_Pin, GPIO_PIN_HIGH);
-
-  GPIO_InitStruct.Pin = HC165_CLK_Pin | HC165_SH_LD_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  GPIO_InitStruct.Pin = HC165_QA_Pin | HC165_QB_Pin | HC165_QC_Pin | HC165_QD_Pin |
-                         HC165_QE_Pin | HC165_QF_Pin | HC165_QG_Pin | HC165_QH_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-}
-
-void MX_DMA_Init(void)
-{
-  DMA_Init();
-}
-
-void MX_TIM2_Init(void)
-{
-  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
-  TIM_MasterConfigTypeDef sMasterConfig = {0};
-
-  htim2.Instance = TIM2;
-  htim2.Init.Prescaler = 7999; // 8MHz / 8000 = 1kHz
-  htim2.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim2.Init.Period = 4999; // 1kHz / 5000 = 200us
-  htim2.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  if (HAL_TIM_Base_Init(&htim2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
-  if (HAL_TIM_ConfigClockSource(&htim2, &sClockSourceConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  sMasterConfig.MasterOutputTrigger = TIM_TRGO_UPDATE;
-  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_ENABLE;
-  if (HAL_TIMEx_MasterConfigSynchronization(&htim2, &sMasterConfig) != HAL_OK)
-  {
-    Error_Handler();
-  }
-}
-위의 코드는 STM32G070 마이크로컨트롤러와 DMA를 사용하여 확장된 입력 상태를 확인하는 예제입니다. 코드에서 HC165_ReadInputs() 함수를 사용하여 입력 상태를 읽고 input_state 배열에 저장하고, HAL_TIM_PeriodElapsedCallback() 함수에서 DMA를 사용하여 읽은 데이터를 메모리로 전송합니다. 그리고 HAL_TIM_PeriodElapsedHalfCpltCallback() 함수에서 DMA 전송이 완료된 후에 입력 상태를 확인합니다.
-
-위의 코드는 STM32G070 마이크로컨트롤러와 74HC165을 사용하여 확장된 입력 상태를 DMA를 통해 읽고 표시하는 예제입니다. 실제로는 회로 연결과 입력 핀 및 DMA 설정에 맞게 코드를 수정해야 합니다.

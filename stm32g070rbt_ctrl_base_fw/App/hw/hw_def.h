@@ -66,9 +66,6 @@
 #define _USE_HW_UART_1_DMA_RX
 #define _USE_HW_UART_2_DMA_RX
 #define _USE_HW_UART_3_DMA_RX
-#define _USE_HW_UART_1_DMA_TX
-#define _USE_HW_UART_2_DMA_TX
-#define _USE_HW_UART_3_DMA_TX
 
 
 //#define _USE_HW_LOG
@@ -77,6 +74,7 @@
 #define      HW_LOG_LIST_BUF_MAX    2048
 
 #define _USE_HW_CLI
+#define      HW_CLI_CH              _DEF_UART3
 #define      HW_CLI_CMD_LIST_MAX    16
 #define      HW_CLI_CMD_NAME_MAX    16
 #define      HW_CLI_LINE_HIS_MAX    4
@@ -94,11 +92,14 @@
 //#define        _SPI_W25Q16          _DEF_SPI1
 //#define        _SPI_SLAVE           _DEF_SPI2
 
+#define _USE_HW_LCD
+#define _USE_HW_SSD1306
+#define      HW_LCD_WIDTH           128
+#define      HW_LCD_HEIGHT          32
 
-//#define _USE_HW_I2C
-#define      HW_I2C_MAX_CH          2
-#define        _I2C_EXT_IO          _DEF_I2C1
-#define        _I2C_EEPROM          _DEF_I2C2
+
+#define _USE_HW_I2C
+#define      HW_I2C_MAX_CH          1
 
 
 #endif /* HW_HW_DEF_H_ */

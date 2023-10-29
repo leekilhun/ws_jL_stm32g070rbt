@@ -7,8 +7,6 @@
 
 #include "ap.hpp"
 
-
-
 #ifdef _USE_HW_CLI
 static void cliApp(cli_args_t *args);
 #endif
@@ -57,7 +55,7 @@ void apInit(void)
   }
   // end of swtimer
 
-   {
+  {
     enLed::cfg_t cfg;
     cfg.gpio_port = STATUS_GPIO_Port;
     cfg.gpio_pin = STATUS_Pin;
@@ -67,24 +65,35 @@ void apInit(void)
   }
 
 #ifdef _USE_HW_CLI
-  cliOpen(HW_UART_LOG, 115200);
+  cliOpen(HW_CLI_CH, 115200);
 #endif
+
+  for (int i = 0; i < 32; i += 1)
+  {
+    lcdClearBuffer(black);
+    lcdPrintfResize(0, 40 - i, green, 16, "  -- WIZnet --");
+    lcdDrawRect(0, 0, LCD_WIDTH, LCD_HEIGHT, white);
+    lcdUpdateDraw();
+    delay(10);
+  }
+
+  delay(1000);
+  lcdClearBuffer(black);
+  lcdPrintfResize(0, 0, green, 16, "Getting IP..");
+  lcdUpdateDraw();
 
   /*Assign Obj */
   mcu_io.Init();
-
 
 #ifdef _USE_HW_CLI
   cliAdd("app", cliApp);
 #endif
 }
 
-
 void apMain(void)
 {
   uint32_t pre_time;
   pre_time = millis();
-
 
   while (1)
   {
@@ -92,17 +101,15 @@ void apMain(void)
     {
       pre_time = millis();
 
-      LOG_PRINT("HC165 STATE [%d]!",hc165_ReadInputs(0));
+      // LOG_PRINT("HC165 STATE [%d]!",hc165_ReadInputs(0));
     }
+
+    lcdUpdateDraw();
 
 #ifdef _USE_HW_CLI
     cliMain();
 #endif
-
-
   }
-
-
 }
 
 void updateLED()
@@ -116,14 +123,12 @@ void updateLED()
 
     if (millis() - pre_time_update_led >= 1000)
     {
-      pre_time_update_led = millis();      
+      pre_time_update_led = millis();
       leds[AP_OBJ::LED_STATUS].Toggle();
     }
   }
   // end of status led
-
 }
-
 
 #ifdef _USE_HW_CLI
 
@@ -141,7 +146,6 @@ void cliApp(cli_args_t *args)
     {
       while (cliKeepLoop())
       {
-
       }
 
       ret = true;
@@ -177,11 +181,9 @@ void cliApp(cli_args_t *args)
   }
   else if (args->argc == 3)
   {
-
   }
   else if (args->argc == 4)
   {
-
   }
 
   if (ret == false)
@@ -195,8 +197,6 @@ void cliApp(cli_args_t *args)
 }
 #endif
 
-
-
 void apISR_1ms(void *arg)
 {
   /* 1. io register */
@@ -207,4 +207,3 @@ void apISR_10ms(void *arg)
 {
   updateLED();
 }
-
