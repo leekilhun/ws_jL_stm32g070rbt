@@ -74,7 +74,8 @@
 			"streambuf": "cpp",
 			"cinttypes": "cpp",
 			"typeinfo": "cpp",
-			"hc165.h": "c"
+			"hc165.h": "c",
+			"lcd_fonts.h": "c"
 		}
   }
 }

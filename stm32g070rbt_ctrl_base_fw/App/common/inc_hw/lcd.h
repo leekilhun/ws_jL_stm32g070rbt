@@ -71,7 +71,8 @@ typedef enum
   LCD_FONT_07x10,
   LCD_FONT_11x18,
   LCD_FONT_16x26,
-  LCD_FONT_HAN,
+  
+  //LCD_FONT_HAN,
   LCD_FONT_MAX
 } LcdFont;
 

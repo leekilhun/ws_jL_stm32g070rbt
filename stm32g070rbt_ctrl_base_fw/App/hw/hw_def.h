@@ -96,6 +96,10 @@
 #define _USE_HW_SSD1306
 #define      HW_LCD_WIDTH           128
 #define      HW_LCD_HEIGHT          32
+#define _USE_LCD_FONT_7x10
+#define _USE_LCD_FONT_11x18
+#define _USE_LCD_FONT_16x26
+//#define _USE_LCD_FONT_HANGUL_16x16
 
 
 #define _USE_HW_I2C
